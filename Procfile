@@ -1,1 +1,1 @@
-web: ./build/install/todo/bin/todo
+web: java $JAVA_OPTS -cp build/classes:build/libs/* Main
