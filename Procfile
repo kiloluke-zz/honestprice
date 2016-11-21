@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -cp build/classes:build/libs/* Main
+web: ./build/install/honestprice2/bin/honestprice2
