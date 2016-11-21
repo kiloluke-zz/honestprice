@@ -1,1 +1,1 @@
-web: ./build/install/honestprice2/bin/honestprice2
+web: gradle :run
