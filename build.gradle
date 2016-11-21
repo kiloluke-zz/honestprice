@@ -2,8 +2,10 @@ group 'kilo'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
-applicationName = "honestprice"
+apply plugin: 'application'
+applicationName = "honestprice2"
 sourceCompatibility = 1.8
+mainClassName = "Main"
 
 repositories {
     mavenCentral()
