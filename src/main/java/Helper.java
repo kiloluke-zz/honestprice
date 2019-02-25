@@ -29,10 +29,8 @@ public class Helper {
 
     private ArrayList<String> mailSendingList;
     private Map<String, String> notFoundDetailTypes;
-    private Gmail gmail;
 
     Helper() {
-        gmail = new Gmail();
         mailSendingList = new ArrayList<>();
         notFoundDetailTypes = new LinkedHashMap<>();
     }
@@ -214,11 +212,6 @@ public class Helper {
         StringBuilder stringBuilder = new StringBuilder();
         mailSendingList.forEach((message) -> stringBuilder.append(message).append("<br/>"));
 
-        try {
-            gmail.sendEmail(stringBuilder.toString());
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
 
     }
 

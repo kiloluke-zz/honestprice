@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/HonestPrice.iml" filepath="$PROJECT_DIR$/.idea/modules/HonestPrice.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HonestPrice_main.iml" filepath="$PROJECT_DIR$/.idea/modules/HonestPrice_main.iml" group="HonestPrice" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HonestPrice_test.iml" filepath="$PROJECT_DIR$/.idea/modules/HonestPrice_test.iml" group="HonestPrice" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HonestPrice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/HonestPrice.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HonestPrice.test.iml" filepath="$PROJECT_DIR$/.idea/modules/HonestPrice.test.iml" />
     </modules>
   </component>
 </project>
