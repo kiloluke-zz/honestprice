@@ -4,7 +4,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
@@ -58,12 +57,11 @@ public class Helper {
             String detailFromRequest = detail;
             detail = detail.replace("^", "").replace(",", "").replace("\\t", " ");
             String detailLC = detail.toLowerCase();
-            if (detailLC.contains("colour") || detailLC.contains("color") || detailLC.contains("weight") || detailLC.contains("not included")) {
-                sendBack("Warning", detail, "0");
+            if (detailLC.contains("colour") || detailLC.contains("color") || detailLC.contains("weight") || detailLC.contains("not included") || detailLC.equals("")) {
                 continue;
             }
-            String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36";
-
+//            String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36";
+            String userAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0";
 
 
             final Document googleSearchResult;
@@ -72,26 +70,15 @@ public class Helper {
                         .replace(" ", "+").replaceAll("\\t", "+").trim() + "+amazon").userAgent(userAgent).timeout(0).get();
 
 
-                for (Element googleLink : googleSearchResult.select("h3.r a")) {
-                    if (googleLink.attr("href").contains("amazon") && !googleLink.attr("href").contains(".pdf")
-                            && !googleLink.attr("href").contains("amazonaws")) {
+                for (Element googleElem : googleSearchResult.select(".r")) {
+                    String link = googleElem.childNodes().get(0).attr("href");
+                    if (link.contains("amazon") && !link.contains(".pdf")
+                            && !link.contains("amazonaws")) {
                         try {
-                            Document amazonPage = Jsoup.connect(googleLink.attr("href")).userAgent(userAgent).timeout(500).get();
-                            String priceString;
+                            Document amazonPage = Jsoup.connect(link).userAgent(userAgent).timeout(500).get();
 
-                            try {
-                                priceString = amazonPage.select("span.a-size-medium.a-color-price").first().text();
-                            } catch (NullPointerException n) {
-                                try {
-                                    priceString = amazonPage.select("span.a-color-price").first().text();
-                                } catch (NullPointerException n2) {
-                                    break;
-                                }
-                            }
 
-                            boolean isItemBikePart = false;
-                            boolean isItemBike = false;
-                            boolean isDetailGroupRecognized = false;
+                            boolean isItemBikePart = false, isItemBike = false;
 
                             for (Element element1 : amazonPage.select("a.a-link-normal.a-color-tertiary")) {
 
@@ -120,6 +107,25 @@ public class Helper {
                             }
 
                             StringBuilder priceFormatted = new StringBuilder();
+
+                            String priceString = "";
+
+
+                            String[] amazonPriceSelectors = new String[]{"#priceblock_ourprice",
+                                    "#olp-upd-new > span > a", "#price_inside_buybox",
+                                    "#comparison_price_row > td.comparison_baseitem_column > span > span:nth-child(2) > span.a-price-whole"};
+
+
+                            for (int i = 0; i < amazonPriceSelectors.length; i++) {
+
+                                if (amazonPage.select(amazonPriceSelectors[i]) != null){
+                                    priceString = amazonPage.select(amazonPriceSelectors[i]).text();
+                                    break;
+                                }
+
+                            }
+
+
                             Element group = amazonPage.select("a.a-link-normal.a-color-tertiary").last();
                             if (priceString.length() > 6) {
                                 priceFormatted.append(priceString.substring(0, 6));
@@ -135,13 +141,12 @@ public class Helper {
 
                             requiredDetailTest(group.text());
                             requiredDetailTest(detailFromRequest.split("\\s")[0]);
-                            mailSendingList.add("<a href=\"" + googleLink.attr("href") + "\">" + detail + "</a>");
-                            sendBack(group.text(), detailFromRequest, priceFormatted.toString());
+                            response(group.text(), detailFromRequest, priceFormatted.toString());
                             break;
 
                         } catch (Exception e) {
                             e.printStackTrace();
-                            mailSendingList.add("<p>Error! " + e.toString() + "</p><a href=\"" + googleLink.attr("href") + "\">" + detail + "</a>");
+                            mailSendingList.add("<p>Error! " + e.toString() + "</p><a href=\"" + googleElem.attr("href") + "\">" + detail + "</a>");
                         }
 
                     }
@@ -149,18 +154,17 @@ public class Helper {
             } catch (IOException e) {
                 e.printStackTrace();
                 mailSendingList.add("<p>Error! " + e.toString() + "</p>");
-                sendBack("Error. No connection", "Try again", "-1");
+                response("Error. No connection", "Try again", "-1");
             }
 
         }
 
 
-        // NEEDS TO BE REDONE
         Set<String> keys = notFoundDetailTypes.keySet();
 
         if (notFoundDetailTypes.size() > 0) {
             sendHeadingBack("Not recognized parts that are required to be in a bicycle");
-            notFoundDetailTypes.forEach((k, v) -> sendBack(k, " ", v));
+            notFoundDetailTypes.forEach((k, v) -> response(k, " ", v));
         }
         DecimalFormat df = new DecimalFormat("#.##");
         df.setRoundingMode(RoundingMode.CEILING);
@@ -196,14 +200,7 @@ public class Helper {
     }
 
     private void removeFromNotFoundDetails(String detailType) {
-        Iterator<String> iterator = notFoundDetailTypes.keySet().iterator();
-        while (iterator.hasNext()) {
-            String dt = iterator.next();
-            if (dt.equalsIgnoreCase(detailType)) {
-                iterator.remove();
-            }
-
-        }
+        notFoundDetailTypes.keySet().removeIf(dt -> dt.equalsIgnoreCase(detailType));
 
     }
 
@@ -211,8 +208,6 @@ public class Helper {
     private void sendList() {
         StringBuilder stringBuilder = new StringBuilder();
         mailSendingList.forEach((message) -> stringBuilder.append(message).append("<br/>"));
-
-
     }
 
 
@@ -279,7 +274,7 @@ public class Helper {
                 ).render();
     }
 
-    private void sendBack(String heading, String detail, String price) {
+    private void response(String heading, String detail, String price) {
         broadcastData(heading, detail, price, session);
     }
 

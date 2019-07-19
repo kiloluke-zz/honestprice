@@ -15,6 +15,7 @@ public class Main {
         Helper helper = new Helper();
         staticFileLocation("/public");
         webSocket("/main", WebSocketHandler.class);
+        get("/", (req, res) ->res.body(helper.renderContent("public/index.html"));
         get("/contact", (req, res) -> helper.renderContent("public/contact.html"));
 
     }

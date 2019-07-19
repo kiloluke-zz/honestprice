@@ -6,7 +6,7 @@ var inputArray;
 id("submitBtn").addEventListener("click", function () {
     clearBox('tbody');
     //Establish the WebSocket connection and set up event handlers
-    webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/main/");
+    webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/main");
 
 
 

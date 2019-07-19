@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-##  honestprice2 start up script for UN*X
+##  Gradle start up script for UN*X
 ##
 ##############################################################################
 
@@ -20,24 +20,24 @@ while [ -h "$PRG" ] ; do
     fi
 done
 SAVED="`pwd`"
-cd "`dirname \"$PRG\"`/.." >/dev/null
+cd "`dirname \"$PRG\"`/" >/dev/null
 APP_HOME="`pwd -P`"
 cd "$SAVED" >/dev/null
 
-APP_NAME="honestprice2"
+APP_NAME="Gradle"
 APP_BASE_NAME=`basename "$0"`
 
-# Add default JVM options here. You can also use JAVA_OPTS and HONESTPRICE2_OPTS to pass JVM options to this script.
+# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS=""
 
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD="maximum"
 
-warn ( ) {
+warn () {
     echo "$*"
 }
 
-die ( ) {
+die () {
     echo
     echo "$*"
     echo
@@ -64,7 +64,7 @@ case "`uname`" in
     ;;
 esac
 
-CLASSPATH=$APP_HOME/lib/HonestPrice-1.0-SNAPSHOT.jar:$APP_HOME/lib/mail-1.4.7.jar:$APP_HOME/lib/javax.mail-api-1.5.6.jar:$APP_HOME/lib/jackson-core-2.7.3.jar:$APP_HOME/lib/jackson-databind-2.7.3.jar:$APP_HOME/lib/spark-core-2.5.2.jar:$APP_HOME/lib/j2html-0.7.jar:$APP_HOME/lib/jsoup-1.9.2.jar:$APP_HOME/lib/slf4j-simple-1.6.2.jar:$APP_HOME/lib/activation-1.1.jar:$APP_HOME/lib/jackson-annotations-2.7.0.jar:$APP_HOME/lib/slf4j-api-1.7.13.jar:$APP_HOME/lib/jetty-server-9.3.6.v20151106.jar:$APP_HOME/lib/jetty-webapp-9.3.6.v20151106.jar:$APP_HOME/lib/websocket-server-9.3.6.v20151106.jar:$APP_HOME/lib/websocket-servlet-9.3.6.v20151106.jar:$APP_HOME/lib/junit-4.12.jar:$APP_HOME/lib/commons-lang3-3.4.jar:$APP_HOME/lib/closure-compiler-r2388.jar:$APP_HOME/lib/javax.servlet-api-3.1.0.jar:$APP_HOME/lib/jetty-http-9.3.6.v20151106.jar:$APP_HOME/lib/jetty-io-9.3.6.v20151106.jar:$APP_HOME/lib/jetty-xml-9.3.6.v20151106.jar:$APP_HOME/lib/jetty-servlet-9.3.6.v20151106.jar:$APP_HOME/lib/websocket-common-9.3.6.v20151106.jar:$APP_HOME/lib/websocket-client-9.3.6.v20151106.jar:$APP_HOME/lib/websocket-api-9.3.6.v20151106.jar:$APP_HOME/lib/hamcrest-core-1.3.jar:$APP_HOME/lib/args4j-2.0.16.jar:$APP_HOME/lib/guava-13.0.1.jar:$APP_HOME/lib/protobuf-java-2.4.1.jar:$APP_HOME/lib/json-20090211.jar:$APP_HOME/lib/ant-1.8.2.jar:$APP_HOME/lib/jsr305-1.3.9.jar:$APP_HOME/lib/jarjar-1.1.jar:$APP_HOME/lib/jetty-util-9.3.6.v20151106.jar:$APP_HOME/lib/jetty-security-9.3.6.v20151106.jar:$APP_HOME/lib/ant-launcher-1.8.2.jar
+CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
@@ -155,13 +155,14 @@ if $cygwin ; then
 fi
 
 # Escape application args
-for s in "${@}" ; do
-    s=\"$s\"
-    APP_ARGS=$APP_ARGS" "$s
-done
+save () {
+    for i do printf %s\\n "$i" | sed "s/'/'\\\\''/g;1s/^/'/;\$s/\$/' \\\\/" ; done
+    echo " "
+}
+APP_ARGS=$(save "$@")
 
 # Collect all arguments for the java command, following the shell quoting and substitution rules
-eval set -- "$DEFAULT_JVM_OPTS" "$JAVA_OPTS" "$HONESTPRICE2_OPTS" -classpath "\"$CLASSPATH\"" Main "$APP_ARGS"
+eval set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS "\"-Dorg.gradle.appname=$APP_BASE_NAME\"" -classpath "\"$CLASSPATH\"" org.gradle.wrapper.GradleWrapperMain "$APP_ARGS"
 
 # by default we should be in the correct project dir, but when run from Finder on Mac, the cwd is wrong
 if [ "$(uname)" = "Darwin" ] && [ "$HOME" = "$PWD" ]; then
