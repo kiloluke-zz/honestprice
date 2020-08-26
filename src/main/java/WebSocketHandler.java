@@ -30,7 +30,7 @@ public class WebSocketHandler {
         message = message.substring(1, message.length() - 1);
         try {
             itemList = mapper.readValue(message.replace("\\", ""), ArrayList.class);
-            Helper.getInstance().session = user;
+            Helper.getInstance().setSession(user);
             Helper.getInstance().amazonSearch(itemList);
             Helper.getInstance().setTotalPrice(0);
 

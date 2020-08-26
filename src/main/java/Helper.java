@@ -20,22 +20,26 @@ public class Helper {
 
     private static final Helper INSTANCE = new Helper();
     private float totalPrice;
-    Session session;
+    private Session session;
+    private static final List<String> amazonPriceSelectors = Arrays.asList("#priceblock_ourprice",
+            "#olp-upd-new > span > a", "#price_inside_buybox",
+            "#comparison_price_row > td.comparison_baseitem_column > span > span:nth-child(2) > span.a-price-whole");
 
-    static Helper getInstance() {
+
+    public static Helper getInstance() {
         return INSTANCE;
     }
 
-    private ArrayList<String> mailSendingList;
+    private List<String> mailSendingList;
     private Map<String, String> notFoundDetailTypes;
 
-    Helper() {
+    private Helper() {
         mailSendingList = new ArrayList<>();
         notFoundDetailTypes = new LinkedHashMap<>();
     }
 
 
-    void amazonSearch(ArrayList<String> details) {
+    public void amazonSearch(List<String> details) {
 
         notFoundDetailTypes.clear();
 
@@ -60,7 +64,6 @@ public class Helper {
             if (detailLC.contains("colour") || detailLC.contains("color") || detailLC.contains("weight") || detailLC.contains("not included") || detailLC.equals("")) {
                 continue;
             }
-//            String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36";
             String userAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0";
 
 
@@ -82,16 +85,6 @@ public class Helper {
 
                             for (Element element1 : amazonPage.select("a.a-link-normal.a-color-tertiary")) {
 
-//                                if (!isDetailGroupRecognized) {
-//                                    for (String requiredDetail : notFoundDetailTypes.keySet()) {
-//                                        if (element1.text().toLowerCase().contains(requiredDetail.toLowerCase())
-//                                                || itemLC.contains(requiredDetail.toLowerCase())) {
-//                                            notFoundDetailTypes.remove(requiredDetail);
-//                                            isDetailGroupRecognized = true;
-//                                            break;
-//                                        }
-//                                    }
-//                                }
                                 if (element1.text().equalsIgnoreCase("Cycling")) {
                                     isItemBikePart = true;
                                 }
@@ -108,22 +101,8 @@ public class Helper {
 
                             StringBuilder priceFormatted = new StringBuilder();
 
-                            String priceString = "";
+                            String priceString = getPriceBySelector(amazonPage);
 
-
-                            String[] amazonPriceSelectors = new String[]{"#priceblock_ourprice",
-                                    "#olp-upd-new > span > a", "#price_inside_buybox",
-                                    "#comparison_price_row > td.comparison_baseitem_column > span > span:nth-child(2) > span.a-price-whole"};
-
-
-                            for (int i = 0; i < amazonPriceSelectors.length; i++) {
-
-                                if (amazonPage.select(amazonPriceSelectors[i]) != null){
-                                    priceString = amazonPage.select(amazonPriceSelectors[i]).text();
-                                    break;
-                                }
-
-                            }
 
 
                             Element group = amazonPage.select("a.a-link-normal.a-color-tertiary").last();
@@ -170,6 +149,14 @@ public class Helper {
         df.setRoundingMode(RoundingMode.CEILING);
         sendHeadingBack("Total price $" + df.format(totalPrice));
 
+    }
+
+    private String getPriceBySelector(Document amazonPage) {
+        return amazonPriceSelectors.stream()
+                .filter(Objects::nonNull)
+                .map(selector -> amazonPage.select(selector).text())
+                .findFirst()
+                .get();
     }
 
     private void requiredDetailTest(String detailType) {
@@ -221,7 +208,7 @@ public class Helper {
         return null;
     }
 
-    private void broadcastData(String heading, String detail, String price, Session session) {
+    private void broadcastData(String heading, String detail, String price) {
 
         try {
             session.getRemote().sendString(String.valueOf(new JSONObject()
@@ -232,7 +219,7 @@ public class Helper {
 
     }
 
-    private void broadcastData(String heading, Session session) {
+    private void broadcastData(String heading) {
         try {
             session.getRemote().sendString(String.valueOf(new JSONObject()
                     .put("info", createHtmlHeadingMessage(heading))));
@@ -275,14 +262,18 @@ public class Helper {
     }
 
     private void response(String heading, String detail, String price) {
-        broadcastData(heading, detail, price, session);
+        broadcastData(heading, detail, price);
     }
 
     void sendHeadingBack(String heading) {
-        broadcastData(heading, session);
+        broadcastData(heading);
     }
 
     void setTotalPrice(float totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
     }
 }

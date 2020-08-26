@@ -12,7 +12,7 @@ public class Main {
 
         port(port);
 
-        Helper helper = new Helper();
+        Helper helper = Helper.getInstance();
         staticFileLocation("/public");
         webSocket("/main", WebSocketHandler.class);
         get("/", (req, res) -> helper.renderContent("public/index.html"));
